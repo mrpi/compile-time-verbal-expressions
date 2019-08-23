@@ -340,12 +340,12 @@ namespace ctve
    static inline constexpr auto anything_but  = sanitized_str_or_range("(?:[^", "]*)");
    static inline constexpr auto capture       = sanitized_str_or_pattern("(", ")");
 
-   static inline constexpr auto whitespace = pattern{static_string{"\\s"}};
-   static inline constexpr auto word       = pattern{static_string{"\\w+"}};
-   static inline constexpr auto digit      = pattern{static_string{"\\d"}};
-   static inline constexpr auto tab        = pattern{static_string{"\\t"}};
-   static inline constexpr auto line_break = pattern{static_string{"(?:\\r\\n|\\r|\\n)"}};
-   static inline constexpr auto br         = line_break;
-   static inline constexpr auto something  = pattern{static_string{"(?:.+)"}};
-   static inline constexpr auto anything   = pattern{static_string{"(?:.*)"}};
+   static inline constexpr auto whitespace    = pattern{static_string{"\\s"}};
+   static inline constexpr auto word          = pattern{static_string{"\\w+"}};
+   static inline constexpr auto digit         = pattern{static_string{"\\d"}};
+   static inline constexpr auto tab           = pattern{static_string{"\\t"}};
+   static inline constexpr auto line_break    = pattern{static_string{"(?:\\r\\n|\\r|\\n)"}};
+   static inline constexpr auto br            = line_break;
+   static inline constexpr auto something     = pattern{static_string{"(?:.+)"}};
+   static inline constexpr auto anything      = pattern{static_string{"(?:.*)"}};
 }
