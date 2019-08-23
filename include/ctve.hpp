@@ -14,6 +14,8 @@ namespace impl
   template <size_t Len = 0>
   class static_string
   {
+    // TODO: maybe use langeuage array char[] instead of std::array
+    // TODO: Unicode/char32_t instead of char (like ctll::fixed_string uses)
     std::array<char, Len + 1> data_{};
     size_t len_{};
 
@@ -212,7 +214,12 @@ public:
     return add("$");
   }
 
-  [[nodiscard]] constexpr auto one_or_more() const { return add("+"); }
+  [[nodiscard]] constexpr auto one_or_more() const
+  {
+    // TODO: adding multiple quantificatoins ("a*+") should fail to compile
+    // distinguish between qunatified templates and unquantified temmplates
+    return add("+");
+  }
 
   friend inline std::ostream& operator<<(std::ostream& os, const pattern& p)
   {
