@@ -7,6 +7,8 @@ The regular expressions are build at compile time and can be used with compile t
 
 It is based on the ideas of https://github.com/VerbalExpressions.
 
+Try online: https://godbolt.org/z/JV7XAR
+
 ## Example
 
 ```c++
