@@ -13,6 +13,8 @@ It is based on the ideas of https://github.com/VerbalExpressions.
 #include <iostream>
 #include <ctve.hpp>
 
+using namespace ctve;
+
 static constexpr auto urlPattern = find("http")
                                  + maybe('s')
                                  + then("://")
@@ -23,8 +25,9 @@ static constexpr auto urlPattern = find("http")
 
 int main()
 {
-  if (auto&& [match, host, port, path] 
-      = ctre::match<urlPattern>("https://github.com/mrpi/compile-time-verbal-expressions"))
+  auto&& [match, host, port, path] 
+      = ctre::match<urlPattern>("https://github.com/mrpi/compile-time-verbal-expressions");
+  if (match)
   {
     std::cout << "host: " << std::string_view{host} << std::endl;
     std::cout << "port: " << std::string_view{port} << std::endl;
