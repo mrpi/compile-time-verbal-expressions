@@ -68,3 +68,11 @@ static_assert(CTRE_CREATE(hexadecimalNumber).match("0x0"sv));
 static_assert(CTRE_CREATE(hexadecimalNumber).match("0xff"sv));
 static_assert(CTRE_CREATE(hexadecimalNumber).match("3B"sv));
 static_assert(!CTRE_CREATE(hexadecimalNumber).match("0xggg"sv));
+
+static inline constexpr auto nanOrHexadecimalNumber = find("NaN") || hexadecimalNumber;
+static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("NaN"sv));
+static_assert(!CTRE_CREATE(nanOrHexadecimalNumber).match("NaN0x0"sv));
+static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("0x0"sv));
+static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("0xff"sv));
+static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("3B"sv));
+static_assert(!CTRE_CREATE(nanOrHexadecimalNumber).match("0xggg"sv));
