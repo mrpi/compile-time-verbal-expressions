@@ -1,0 +1,6 @@
+AlwaysBreakTemplateDeclarations: true
+NamespaceIndentation: Inner
+BreakBeforeBraces: Allman
+ConstructorInitializerIndentWidth: 1
+MaxEmptyLinesToKeep: 1
+PointerBindsToType: true
