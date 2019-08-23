@@ -76,7 +76,7 @@ namespace ctve
       constexpr static_string& operator+=(char c)
       {
           enforce(size()+1 <= Len);
-          data_[len_++] = c;          
+          data_[len_++] = c;
           return *this;
       }
 
@@ -275,6 +275,10 @@ namespace ctve
    {
        char start;
        char end;
+
+       constexpr range(char start, char end)
+        : start(start), end(end)
+       {}
    };
 
    template<typename T>
@@ -311,14 +315,40 @@ namespace ctve
        };
    }
 
-   template<size_t BufLen1, size_t BufLen2>
-   constexpr auto sanitized_str_or_range(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+   template<size_t Len1, size_t Len2>
+   struct sanitized_str_or_range
    {
-       return [prefix, suffix](auto&& buf){
+       static_string<Len1> prefix;
+       static_string<Len2> suffix;
+       
+       template<size_t BufLen1, size_t BufLen2>
+       constexpr sanitized_str_or_range(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+        : prefix{prefix}, suffix{suffix}
+       {
+       }
+
+       template<typename T>
+       static constexpr auto to_str(T&& buf)
+       {
           static_assert(!is_pattern<std::decay_t<decltype(buf)>>::value, "Only string literals allowed!");
-          return pattern{static_string{prefix + sanitize(buf) + suffix}};
-       };
-   }
+          return sanitize(buf);
+       }
+
+       template<typename T, typename... Args>
+       static constexpr auto to_str(T&& buf, Args&&... args)
+       {
+          return to_str(buf) + to_str(args...);
+       }
+
+       template<typename... T>
+       constexpr auto operator()(T&&... t) const
+       {
+          return pattern{static_string{prefix + to_str(t...) + suffix}};
+       }
+   };
+
+   template<size_t BufLen1, size_t BufLen2>
+   sanitized_str_or_range(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2]) -> sanitized_str_or_range<BufLen1-1, BufLen2-1>;
 
    template<size_t BufLen1, size_t BufLen2>
    constexpr auto sanitized_str(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
@@ -340,10 +370,31 @@ namespace ctve
    static inline constexpr auto anything_but  = sanitized_str_or_range("(?:[^", "]*)");
    static inline constexpr auto capture       = sanitized_str_or_pattern("(", ")");
 
-   static inline constexpr auto whitespace    = pattern{static_string{"\\s"}};
+   template<size_t Len>
+   struct character_type : pattern<Len>
+   {
+      template<size_t BufLen>
+      constexpr explicit character_type(const char (&buf)[BufLen])
+        : pattern<Len>{static_string{buf}}
+       {
+       }
+   };
+
+   template<size_t BufLen>
+   character_type(const char (&buf)[BufLen]) -> character_type<BufLen-1>;
+
+   static inline constexpr auto any_char       = character_type{"."};
+   static inline constexpr auto whitespace     = character_type{"\\s"};
+   static inline constexpr auto space          = whitespace;
+   static inline constexpr auto non_space      = character_type{"\\S"};
+   static inline constexpr auto word_char      = character_type{"\\w"};
+   static inline constexpr auto non_word_char  = character_type{"\\W"};
+   static inline constexpr auto word_boundary  = character_type{"\\b"};
+   static inline constexpr auto digit          = character_type{"\\d"};
+   static inline constexpr auto non_digit      = character_type{"\\D"};
+   static inline constexpr auto tab            = character_type{"\\t"};
+
    static inline constexpr auto word          = pattern{static_string{"\\w+"}};
-   static inline constexpr auto digit         = pattern{static_string{"\\d"}};
-   static inline constexpr auto tab           = pattern{static_string{"\\t"}};
    static inline constexpr auto line_break    = pattern{static_string{"(?:\\r\\n|\\r|\\n)"}};
    static inline constexpr auto br            = line_break;
    static inline constexpr auto something     = pattern{static_string{"(?:.+)"}};
