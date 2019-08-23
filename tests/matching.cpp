@@ -76,3 +76,6 @@ static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("0x0"sv));
 static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("0xff"sv));
 static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("3B"sv));
 static_assert(!CTRE_CREATE(nanOrHexadecimalNumber).match("0xggg"sv));
+
+static inline constexpr auto captureName = find("Hello ") + capture(word) + maybe('!');
+static_assert(CTRE_CREATE(captureName).match("Hello you!"sv).get<1>() == "you"sv);
