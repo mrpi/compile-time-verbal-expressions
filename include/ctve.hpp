@@ -1,25 +1,22 @@
 #include <ctre.hpp>
 
-#include "ctve/static_string.hpp"
 #include "ctve/character_type.hpp"
 #include "ctve/function_builder.hpp"
 #include "ctve/pattern.hpp"
+#include "ctve/static_string.hpp"
 
 namespace ctve
 {
 
-static inline constexpr auto find = impl::sanitized_str("(?:", ")");
+static inline constexpr auto find = impl::str_fn("(?:", ")");
 static inline constexpr auto then = find;
-static inline constexpr auto maybe =
-    impl::sanitized_str_or_pattern("(?:", ")?");
-static inline constexpr auto not_ = impl::sanitized_str_or_pattern("(?!", ")");
-static inline constexpr auto any_of = impl::sanitized_str_or_range("[", "]");
+static inline constexpr auto maybe = impl::str_or_pattern_fn("(?:", ")?");
+static inline constexpr auto not_ = impl::str_or_pattern_fn("(?!", ")");
+static inline constexpr auto any_of = impl::chrclass_fn("[", "]");
 static inline constexpr auto any = any_of;
-static inline constexpr auto something_but =
-    impl::sanitized_str_or_range("(?:[^", "]+)");
-static inline constexpr auto anything_but =
-    impl::sanitized_str_or_range("(?:[^", "]*)");
-static inline constexpr auto capture = impl::sanitized_str_or_pattern("(", ")");
+static inline constexpr auto capture = impl::str_or_pattern_fn("(", ")");
+static inline constexpr auto something_but = impl::chrclass_fn("(?:[^", "]+)");
+static inline constexpr auto anything_but = impl::chrclass_fn("(?:[^", "]*)");
 
 static inline constexpr auto any_char = impl::character_type{"."};
 static inline constexpr auto whitespace = impl::character_type{"\\s"};

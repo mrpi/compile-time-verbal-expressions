@@ -6,14 +6,14 @@
 namespace ctve::impl
 {
 template <size_t Len1, size_t Len2>
-struct sanitized_str_or_pattern
+struct str_or_pattern_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str_or_pattern(const char (&prefix)[BufLen1],
-                                     const char (&suffix)[BufLen2])
+  constexpr str_or_pattern_fn(const char (&prefix)[BufLen1],
+                              const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -28,19 +28,18 @@ struct sanitized_str_or_pattern
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str_or_pattern(const char (&prefix)[BufLen1],
-                         const char (&suffix)[BufLen2])
-    ->sanitized_str_or_pattern<BufLen1 - 1, BufLen2 - 1>;
+str_or_pattern_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->str_or_pattern_fn<BufLen1 - 1, BufLen2 - 1>;
 
 template <size_t Len1, size_t Len2>
-struct sanitized_str_or_range
+struct chrclass_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str_or_range(const char (&prefix)[BufLen1],
-                                   const char (&suffix)[BufLen2])
+  constexpr chrclass_fn(const char (&prefix)[BufLen1],
+                        const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -67,19 +66,17 @@ struct sanitized_str_or_range
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str_or_range(const char (&prefix)[BufLen1],
-                       const char (&suffix)[BufLen2])
-    ->sanitized_str_or_range<BufLen1 - 1, BufLen2 - 1>;
+chrclass_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->chrclass_fn<BufLen1 - 1, BufLen2 - 1>;
 
 template <size_t Len1, size_t Len2>
-struct sanitized_str
+struct str_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str(const char (&prefix)[BufLen1],
-                          const char (&suffix)[BufLen2])
+  constexpr str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -96,7 +93,7 @@ struct sanitized_str
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
-    ->sanitized_str<BufLen1 - 1, BufLen2 - 1>;
+str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->str_fn<BufLen1 - 1, BufLen2 - 1>;
 
 } // namespace ctve::impl

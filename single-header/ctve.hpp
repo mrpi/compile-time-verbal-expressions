@@ -541,14 +541,14 @@ namespace impl
 namespace ctve::impl
 {
 template <size_t Len1, size_t Len2>
-struct sanitized_str_or_pattern
+struct str_or_pattern_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str_or_pattern(const char (&prefix)[BufLen1],
-                                     const char (&suffix)[BufLen2])
+  constexpr str_or_pattern_fn(const char (&prefix)[BufLen1],
+                              const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -563,19 +563,18 @@ struct sanitized_str_or_pattern
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str_or_pattern(const char (&prefix)[BufLen1],
-                         const char (&suffix)[BufLen2])
-    ->sanitized_str_or_pattern<BufLen1 - 1, BufLen2 - 1>;
+str_or_pattern_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->str_or_pattern_fn<BufLen1 - 1, BufLen2 - 1>;
 
 template <size_t Len1, size_t Len2>
-struct sanitized_str_or_range
+struct chrclass_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str_or_range(const char (&prefix)[BufLen1],
-                                   const char (&suffix)[BufLen2])
+  constexpr chrclass_fn(const char (&prefix)[BufLen1],
+                        const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -602,19 +601,17 @@ struct sanitized_str_or_range
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str_or_range(const char (&prefix)[BufLen1],
-                       const char (&suffix)[BufLen2])
-    ->sanitized_str_or_range<BufLen1 - 1, BufLen2 - 1>;
+chrclass_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->chrclass_fn<BufLen1 - 1, BufLen2 - 1>;
 
 template <size_t Len1, size_t Len2>
-struct sanitized_str
+struct str_fn
 {
   static_string<Len1> prefix;
   static_string<Len2> suffix;
 
   template <size_t BufLen1, size_t BufLen2>
-  constexpr sanitized_str(const char (&prefix)[BufLen1],
-                          const char (&suffix)[BufLen2])
+  constexpr str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
    : prefix{prefix}, suffix{suffix}
   {
   }
@@ -631,26 +628,23 @@ struct sanitized_str
 };
 
 template <size_t BufLen1, size_t BufLen2>
-sanitized_str(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
-    ->sanitized_str<BufLen1 - 1, BufLen2 - 1>;
+str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
+    ->str_fn<BufLen1 - 1, BufLen2 - 1>;
 
 } // namespace ctve::impl
 
 namespace ctve
 {
 
-static inline constexpr auto find = impl::sanitized_str("(?:", ")");
+static inline constexpr auto find = impl::str_fn("(?:", ")");
 static inline constexpr auto then = find;
-static inline constexpr auto maybe =
-    impl::sanitized_str_or_pattern("(?:", ")?");
-static inline constexpr auto not_ = impl::sanitized_str_or_pattern("(?!", ")");
-static inline constexpr auto any_of = impl::sanitized_str_or_range("[", "]");
+static inline constexpr auto maybe = impl::str_or_pattern_fn("(?:", ")?");
+static inline constexpr auto not_ = impl::str_or_pattern_fn("(?!", ")");
+static inline constexpr auto any_of = impl::chrclass_fn("[", "]");
 static inline constexpr auto any = any_of;
-static inline constexpr auto something_but =
-    impl::sanitized_str_or_range("(?:[^", "]+)");
-static inline constexpr auto anything_but =
-    impl::sanitized_str_or_range("(?:[^", "]*)");
-static inline constexpr auto capture = impl::sanitized_str_or_pattern("(", ")");
+static inline constexpr auto capture = impl::str_or_pattern_fn("(", ")");
+static inline constexpr auto something_but = impl::chrclass_fn("(?:[^", "]+)");
+static inline constexpr auto anything_but = impl::chrclass_fn("(?:[^", "]*)");
 
 static inline constexpr auto any_char = impl::character_type{"."};
 static inline constexpr auto whitespace = impl::character_type{"\\s"};
