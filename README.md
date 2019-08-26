@@ -7,7 +7,7 @@ The regular expressions are build at compile time and can be used with compile t
 
 It is based on the ideas of https://github.com/VerbalExpressions and powered by the wish to use Hana Dusíkovás fantastic [compile time regular expression library](https://github.com/hanickadot/compile-time-regular-expressions) without having to maintain code sprinkled with dozens of hard to read regular expressions.
 
-Try online: https://godbolt.org/z/JV7XAR
+Try online: https://godbolt.org/z/ISDgfd
 
 ## Example
 
