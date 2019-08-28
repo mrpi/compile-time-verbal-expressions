@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <stdexcept>
 
 namespace ctve
@@ -51,6 +52,8 @@ public:
   constexpr const char* data() const { return data_.data(); }
 
   constexpr const char* c_str() const { return data(); }
+
+  constexpr bool empty() const { return !len_; }
 
   constexpr size_t size() const { return len_; }
 
@@ -128,4 +131,34 @@ constexpr auto operator+(const static_string<Len>& str,
   res += str2;
   return res;
 }
+
+template <typename Int>
+constexpr auto to_string(Int num)
+{
+  static_string<std::numeric_limits<Int>::digits + 1> reverseRes;
+  static_string<std::numeric_limits<Int>::digits + 1> res;
+
+  if (num < 0)
+  {
+    res += '-';
+    num = -num;
+  }
+
+  if (!num)
+    reverseRes += '0';
+  else
+  {
+    while (num)
+    {
+      reverseRes += '0' + (num % 10);
+      num /= 10;
+    }
+  }
+
+  for (size_t i = 0; i < reverseRes.size(); i++)
+    res += reverseRes[reverseRes.size() - 1 - i];
+
+  return res;
+}
+
 } // namespace ctve

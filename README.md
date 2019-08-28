@@ -15,20 +15,24 @@ Try online: https://godbolt.org/z/ISDgfd
 #include <iostream>
 #include <ctve.hpp>
 
+namespace patterns
+{
 using namespace ctve;
 
-static constexpr auto urlPattern = find("http")
-                                 + maybe('s')
-                                 + then("://")
-                                 + maybe("www.")
-                                 + capture(something_but(" /:"))
-                                 + maybe(then(':') + capture(digit.one_or_more()))
-                                 + maybe(capture(then('/') + anything_but(' ')));
+static constexpr auto urlPattern =
+    "http"
+    + maybe('s')
+    + "://"
+    + maybe("www.")
+    + capture(something_not_in(' ', '/', ':'))
+    + maybe(then(':') + capture(digit.one_or_more()))
+    + maybe(capture(then('/') + something_not_in(' ')));
+}
 
 int main()
 {
   auto&& [match, host, port, path] 
-      = ctre::match<urlPattern>("https://github.com/mrpi/compile-time-verbal-expressions");
+      = ctre::match<patterns::url>("https://github.com/mrpi/compile-time-verbal-expressions");
   if (match)
   {
     std::cout << "host: " << std::string_view{host} << std::endl;

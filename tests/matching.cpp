@@ -56,7 +56,7 @@ static_assert(
 static_assert(
     CTRE_CREATE(ctve_is_not_not_great).match("CTVE is very great!"sv));
 
-static inline constexpr auto b_to_f = any_of(range{'b', 'f'});
+static inline constexpr auto b_to_f = in(range{'b', 'f'});
 static_assert(!CTRE_CREATE(b_to_f).match("a"sv));
 static_assert(CTRE_CREATE(b_to_f).match("b"sv));
 static_assert(!CTRE_CREATE(b_to_f).match("bc"sv));
@@ -64,21 +64,21 @@ static_assert(CTRE_CREATE(b_to_f).match("c"sv));
 static_assert(CTRE_CREATE(b_to_f).match("f"sv));
 static_assert(!CTRE_CREATE(b_to_f).match("g"sv));
 
-static inline constexpr auto wordChar = any_of(word_char);
+static inline constexpr auto wordChar = in(word_char);
 static_assert(CTRE_CREATE(wordChar).match("a"sv));
 static_assert(CTRE_CREATE(wordChar).match("Z"sv));
 static_assert(CTRE_CREATE(wordChar).match("0"sv));
 static_assert(CTRE_CREATE(wordChar).match("9"sv));
 
 static inline constexpr auto hexadecimalNumber =
-    maybe("0x") + any_of(digit, range{'a', 'f'}, range{'A', 'F'}).one_or_more();
+    maybe("0x") + in(digit, range{'a', 'f'}, range{'A', 'F'}).one_or_more();
 static_assert(CTRE_CREATE(hexadecimalNumber).match("0x0"sv));
 static_assert(CTRE_CREATE(hexadecimalNumber).match("0xff"sv));
 static_assert(CTRE_CREATE(hexadecimalNumber).match("3B"sv));
 static_assert(!CTRE_CREATE(hexadecimalNumber).match("0xggg"sv));
 
 static inline constexpr auto nanOrHexadecimalNumber =
-    find("NaN") || hexadecimalNumber;
+    "NaN" || hexadecimalNumber;
 static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("NaN"sv));
 static_assert(!CTRE_CREATE(nanOrHexadecimalNumber).match("NaN0x0"sv));
 static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("0x0"sv));
@@ -87,21 +87,37 @@ static_assert(CTRE_CREATE(nanOrHexadecimalNumber).match("3B"sv));
 static_assert(!CTRE_CREATE(nanOrHexadecimalNumber).match("0xggg"sv));
 
 static inline constexpr auto captureName =
-    find("Hello ") + capture(word) + maybe('!');
+    "Hello " + capture(word) + maybe('!');
 static_assert(CTRE_CREATE(captureName).match("Hello you!"sv).get<1>() ==
               "you"sv);
 
+static inline constexpr auto zeroOrOneAnyChar = any_char.at_most(1);
+static_assert(CTRE_CREATE(zeroOrOneAnyChar).match(""sv));
+static_assert(CTRE_CREATE(zeroOrOneAnyChar).match("."sv));
+static_assert(CTRE_CREATE(zeroOrOneAnyChar).match("a"sv));
+static_assert(!CTRE_CREATE(zeroOrOneAnyChar).match("ab"sv));
+
+static inline constexpr auto threeToFiveAB = in('a', 'b').count(3, 5);
+static_assert(!CTRE_CREATE(threeToFiveAB).match(""sv));
+static_assert(!CTRE_CREATE(threeToFiveAB).match("ab"sv));
+static_assert(CTRE_CREATE(threeToFiveAB).match("aba"sv));
+static_assert(CTRE_CREATE(threeToFiveAB).match("abab"sv));
+static_assert(CTRE_CREATE(threeToFiveAB).match("ababb"sv));
+static_assert(!CTRE_CREATE(threeToFiveAB).match("ababba"sv));
+
 // would be bad, if the readme example fails unnoticed ;-)
 static constexpr auto urlPattern =
-    find("http")                                      //
+    "http"                                            //
     + maybe('s')                                      //
-    + then("://")                                     //
+    + "://"                                           //
     + maybe("www.")                                   //
-    + capture(something_but(" /:"))                   //
+    + capture(something_not_in(' ', '/', ':'))        //
     + maybe(then(':') + capture(digit.one_or_more())) //
-    + maybe(capture(then('/') + anything_but(' ')));
+    + maybe(capture(then('/') + something_not_in(' ')));
+
 static constexpr auto testUrl =
-    "https://www.github.com:443/mrpi/compile-time-verbal-expressions"sv;
+    "https://github.com:443/mrpi/compile-time-verbal-expressions"sv;
+
 static_assert(CTRE_CREATE(urlPattern).match(testUrl));
 static_assert(CTRE_CREATE(urlPattern).match(testUrl).get<1>() ==
               "github.com"sv);

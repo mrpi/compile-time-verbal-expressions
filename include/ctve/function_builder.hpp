@@ -1,5 +1,6 @@
 #pragma once
 
+#include "character_type.hpp"
 #include "pattern.hpp"
 #include "range.hpp"
 
@@ -47,8 +48,11 @@ struct chrclass_fn
   template <typename T>
   static constexpr auto to_str(T&& buf)
   {
-    static_assert(!is_pattern<std::decay_t<decltype(buf)>>::value,
-                  "Only string literals allowed!");
+    static_assert(
+        std::is_same_v<std::decay_t<decltype(buf)>, char> ||
+            std::is_same_v<std::decay_t<decltype(buf)>, range> ||
+            impl::is_character_type<std::decay_t<decltype(buf)>>::value,
+        "Only characters, character types and ranges allowed!");
     return sanitize(buf);
   }
 

@@ -12,21 +12,15 @@ struct pattern
   constexpr pattern() {}
 
   template <size_t StrLen>
-  constexpr pattern(const static_string<StrLen>& str) : str(str)
+  constexpr explicit pattern(const static_string<StrLen>& str) : str(str)
   {
   }
 
 private:
   template <size_t Len2>
-  [[nodiscard]] constexpr auto add(static_string<Len2> val) const
+  [[nodiscard]] constexpr auto addQuantifier(static_string<Len2> val) const
   {
-    return pattern<Len + Len2>{str + val};
-  }
-
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto add(const char (&buf)[BufLen]) const
-  {
-    return pattern<Len + BufLen - 1>{str + buf};
+    return pattern<4 + Len + Len2>{"(?:" + str + ")" + val};
   }
 
 public:
@@ -40,23 +34,38 @@ public:
 
   constexpr decltype(auto) operator[](size_t idx) const { return str[idx]; }
 
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto start_of_line() const
+  [[nodiscard]] constexpr auto zero_or_more() const
   {
-    return pattern<Len + 1>{"^" + str};
-  }
-
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto end_of_line() const
-  {
-    return add("$");
+    // TODO: adding multiple quantificatoins ("a*+") should fail to compile
+    // distinguish between qunatified templates and unquantified templates
+    return addQuantifier(static_string{"*"});
   }
 
   [[nodiscard]] constexpr auto one_or_more() const
   {
     // TODO: adding multiple quantificatoins ("a*+") should fail to compile
-    // distinguish between qunatified templates and unquantified temmplates
-    return add("+");
+    // distinguish between qunatified templates and unquantified templates
+    return addQuantifier(static_string{"+"});
+  }
+
+  [[nodiscard]] constexpr auto at_least(size_t cnt) const
+  {
+    return addQuantifier("{" + to_string(cnt) + ",}");
+  }
+
+  [[nodiscard]] constexpr auto at_most(size_t cnt) const
+  {
+    return addQuantifier("{0," + to_string(cnt) + "}");
+  }
+
+  [[nodiscard]] constexpr auto count(size_t cnt) const
+  {
+    return addQuantifier("{" + to_string(cnt) + "}");
+  }
+
+  [[nodiscard]] constexpr auto count(size_t least, size_t most) const
+  {
+    return addQuantifier("{" + to_string(least) + "," + to_string(most) + "}");
   }
 
   friend inline std::ostream& operator<<(std::ostream& os, const pattern& p)
@@ -79,6 +88,18 @@ template <size_t Len1, size_t Len2>
 constexpr auto operator||(const pattern<Len1>& p1, const pattern<Len2>& p2)
 {
   return pattern{"(?:" + p1.str + ")|(?:" + p2.str + ")"};
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const char (&buf)[BufLen], const pattern<Len>& p)
+{
+  return pattern{"(?:" + static_string{buf} + ")|(?:" + p.str + ")"};
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const pattern<Len>& p, const char (&buf)[BufLen])
+{
+  return pattern{"(?:" + p.str + ")|(?:" + static_string{buf} + ")"};
 }
 
 namespace impl
