@@ -221,6 +221,7 @@ Software.
 
 #include <ctre.hpp>
 
+#include <array>
 #include <stdexcept>
 
 namespace ctve
@@ -272,6 +273,8 @@ public:
   constexpr const char* data() const { return data_.data(); }
 
   constexpr const char* c_str() const { return data(); }
+
+  constexpr bool empty() const { return !len_; }
 
   constexpr size_t size() const { return len_; }
 
@@ -349,6 +352,36 @@ constexpr auto operator+(const static_string<Len>& str,
   res += str2;
   return res;
 }
+
+template <typename Int>
+constexpr auto to_string(Int num)
+{
+  static_string<std::numeric_limits<Int>::digits + 1> reverseRes;
+  static_string<std::numeric_limits<Int>::digits + 1> res;
+
+  if (num < 0)
+  {
+    res += '-';
+    num = -num;
+  }
+
+  if (!num)
+    reverseRes += '0';
+  else
+  {
+    while (num)
+    {
+      reverseRes += '0' + (num % 10);
+      num /= 10;
+    }
+  }
+
+  for (size_t i = 0; i < reverseRes.size(); i++)
+    res += reverseRes[reverseRes.size() - 1 - i];
+
+  return res;
+}
+
 } // namespace ctve
 
 namespace ctve
@@ -361,21 +394,15 @@ struct pattern
   constexpr pattern() {}
 
   template <size_t StrLen>
-  constexpr pattern(const static_string<StrLen>& str) : str(str)
+  constexpr explicit pattern(const static_string<StrLen>& str) : str(str)
   {
   }
 
 private:
   template <size_t Len2>
-  [[nodiscard]] constexpr auto add(static_string<Len2> val) const
+  [[nodiscard]] constexpr auto addQuantifier(static_string<Len2> val) const
   {
-    return pattern<Len + Len2>{str + val};
-  }
-
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto add(const char (&buf)[BufLen]) const
-  {
-    return pattern<Len + BufLen - 1>{str + buf};
+    return pattern<4 + Len + Len2>{"(?:" + str + ")" + val};
   }
 
 public:
@@ -389,23 +416,38 @@ public:
 
   constexpr decltype(auto) operator[](size_t idx) const { return str[idx]; }
 
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto start_of_line() const
+  [[nodiscard]] constexpr auto zero_or_more() const
   {
-    return pattern<Len + 1>{"^" + str};
-  }
-
-  template <size_t BufLen>
-  [[nodiscard]] constexpr auto end_of_line() const
-  {
-    return add("$");
+    // TODO: adding multiple quantificatoins ("a*+") should fail to compile
+    // distinguish between qunatified templates and unquantified templates
+    return addQuantifier(static_string{"*"});
   }
 
   [[nodiscard]] constexpr auto one_or_more() const
   {
     // TODO: adding multiple quantificatoins ("a*+") should fail to compile
-    // distinguish between qunatified templates and unquantified temmplates
-    return add("+");
+    // distinguish between qunatified templates and unquantified templates
+    return addQuantifier(static_string{"+"});
+  }
+
+  [[nodiscard]] constexpr auto at_least(size_t cnt) const
+  {
+    return addQuantifier("{" + to_string(cnt) + ",}");
+  }
+
+  [[nodiscard]] constexpr auto at_most(size_t cnt) const
+  {
+    return addQuantifier("{0," + to_string(cnt) + "}");
+  }
+
+  [[nodiscard]] constexpr auto count(size_t cnt) const
+  {
+    return addQuantifier("{" + to_string(cnt) + "}");
+  }
+
+  [[nodiscard]] constexpr auto count(size_t least, size_t most) const
+  {
+    return addQuantifier("{" + to_string(least) + "," + to_string(most) + "}");
   }
 
   friend inline std::ostream& operator<<(std::ostream& os, const pattern& p)
@@ -428,6 +470,18 @@ template <size_t Len1, size_t Len2>
 constexpr auto operator||(const pattern<Len1>& p1, const pattern<Len2>& p2)
 {
   return pattern{"(?:" + p1.str + ")|(?:" + p2.str + ")"};
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const char (&buf)[BufLen], const pattern<Len>& p)
+{
+  return pattern{"(?:" + static_string{buf} + ")|(?:" + p.str + ")"};
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const pattern<Len>& p, const char (&buf)[BufLen])
+{
+  return pattern{"(?:" + p.str + ")|(?:" + static_string{buf} + ")"};
 }
 
 namespace impl
@@ -465,6 +519,17 @@ struct character_type : pattern<Len>
 
 template <size_t BufLen>
 character_type(const char (&buf)[BufLen])->character_type<BufLen - 1>;
+
+template <typename T>
+struct is_character_type : std::false_type
+{
+};
+
+template <size_t Len>
+struct is_character_type<character_type<Len>> : std::true_type
+{
+};
+
 } // namespace ctve::impl
 
 namespace ctve::impl
@@ -582,8 +647,11 @@ struct chrclass_fn
   template <typename T>
   static constexpr auto to_str(T&& buf)
   {
-    static_assert(!is_pattern<std::decay_t<decltype(buf)>>::value,
-                  "Only string literals allowed!");
+    static_assert(
+        std::is_same_v<std::decay_t<decltype(buf)>, char> ||
+            std::is_same_v<std::decay_t<decltype(buf)>, range> ||
+            impl::is_character_type<std::decay_t<decltype(buf)>>::value,
+        "Only characters, character types and ranges allowed!");
     return sanitize(buf);
   }
 
@@ -640,11 +708,10 @@ static inline constexpr auto find = impl::str_fn("(?:", ")");
 static inline constexpr auto then = find;
 static inline constexpr auto maybe = impl::str_or_pattern_fn("(?:", ")?");
 static inline constexpr auto not_ = impl::str_or_pattern_fn("(?!", ")");
-static inline constexpr auto any_of = impl::chrclass_fn("[", "]");
-static inline constexpr auto any = any_of;
+static inline constexpr auto in = impl::chrclass_fn("[", "]");
+static inline constexpr auto not_in = impl::chrclass_fn("[^", "]");
 static inline constexpr auto capture = impl::str_or_pattern_fn("(", ")");
-static inline constexpr auto something_but = impl::chrclass_fn("(?:[^", "]+)");
-static inline constexpr auto anything_but = impl::chrclass_fn("(?:[^", "]*)");
+static inline constexpr auto something_not_in = impl::chrclass_fn("[^", "]+");
 
 static inline constexpr auto any_char = impl::character_type{"."};
 static inline constexpr auto whitespace = impl::character_type{"\\s"};
@@ -663,5 +730,17 @@ static inline constexpr auto line_break =
 static inline constexpr auto br = line_break;
 static inline constexpr auto something = pattern{static_string{"(?:.+)"}};
 static inline constexpr auto anything = pattern{static_string{"(?:.*)"}};
+
+template <size_t Len, size_t BufLen>
+constexpr auto operator+(const pattern<Len>& pattern, const char (&buf)[BufLen])
+{
+  return pattern + find(buf);
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator+(const char (&buf)[BufLen], const pattern<Len>& pattern)
+{
+  return find(buf) + pattern;
+}
 
 } // namespace ctve
