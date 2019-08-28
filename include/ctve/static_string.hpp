@@ -2,6 +2,7 @@
 
 #include <array>
 #include <stdexcept>
+#include <string_view>
 
 namespace ctve
 {
