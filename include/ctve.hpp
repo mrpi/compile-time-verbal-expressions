@@ -1,4 +1,4 @@
-#include <ctre.hpp>
+#pragma once
 
 #include "ctve/function_builder.hpp"
 #include "ctve/pattern.hpp"

@@ -12,14 +12,15 @@ Try online: https://godbolt.org/z/ISDgfd
 ## Example
 
 ```c++
-#include <iostream>
 #include <ctve.hpp>
+#include <ctre.hpp>
+#include <iostream>
 
 namespace patterns
 {
 using namespace ctve;
 
-static constexpr auto urlPattern =
+static constexpr auto url =
     "http"
     + maybe('s')
     + "://"

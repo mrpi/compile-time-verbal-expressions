@@ -219,7 +219,7 @@ the License, but only in their entirety and only with respect to the Combined
 Software.
 */
 
-#include <ctre.hpp>
+#pragma once
 
 #include <array>
 #include <stdexcept>

@@ -1,5 +1,7 @@
-#include <ctre.hpp>
 #include <ctve.hpp>
+
+#include <ctre.hpp>
+
 #include <string_view>
 
 template <auto& input>
