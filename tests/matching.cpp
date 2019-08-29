@@ -113,7 +113,7 @@ static constexpr auto urlPattern =
     + maybe("www.")                                   //
     + capture(something_not_in(' ', '/', ':'))        //
     + maybe(then(':') + capture(digit.one_or_more())) //
-    + maybe(capture(then('/') + something_not_in(' ')));
+    + maybe(capture(then('/') + anything_not_in(' ')));
 
 static constexpr auto testUrl =
     "https://github.com:443/mrpi/compile-time-verbal-expressions"sv;

@@ -15,11 +15,11 @@ static inline constexpr auto in = impl::chrclass_fn("[", "]");
 static inline constexpr auto not_in = impl::chrclass_fn("[^", "]");
 static inline constexpr auto capture = impl::str_or_pattern_fn("(", ")");
 static inline constexpr auto something_not_in = impl::chrclass_fn("[^", "]+");
+static inline constexpr auto anything_not_in = impl::chrclass_fn("[^", "]*");
 
 static inline constexpr auto any_char = impl::character_type{"."};
 static inline constexpr auto whitespace = impl::character_type{"\\s"};
-static inline constexpr auto space = whitespace;
-static inline constexpr auto non_space = impl::character_type{"\\S"};
+static inline constexpr auto non_whitespace = impl::character_type{"\\S"};
 static inline constexpr auto word_char = impl::character_type{"\\w"};
 static inline constexpr auto non_word_char = impl::character_type{"\\W"};
 static inline constexpr auto word_boundary = impl::character_type{"\\b"};
