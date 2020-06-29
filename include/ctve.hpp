@@ -46,4 +46,16 @@ constexpr auto operator+(const char (&buf)[BufLen], const pattern<Len>& pattern)
   return find(buf) + pattern;
 }
 
+template <size_t Len>
+constexpr auto operator+(const pattern<Len>& pattern, char c)
+{
+   return pattern + find(c);
+}
+
+template <size_t Len>
+constexpr auto operator+(char c, const pattern<Len>& pattern)
+{
+   return find(c) + pattern;
+}
+
 } // namespace ctve
