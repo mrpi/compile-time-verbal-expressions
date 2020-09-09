@@ -2,7 +2,7 @@
 
 ## C++ Regular Expressions made easy
 
-CRVE is a C++17 library that helps construct difficult regular expressions.
+CTVE is a C++17 library that helps construct difficult regular expressions.
 The regular expressions are build at compile time and can be used with compile time or runtime regular expression libraries.
 
 It is based on the ideas of https://github.com/VerbalExpressions and powered by the wish to use Hana Dusíkovás fantastic [compile time regular expression library](https://github.com/hanickadot/compile-time-regular-expressions) without having to maintain code sprinkled with dozens of hard to read regular expressions.
