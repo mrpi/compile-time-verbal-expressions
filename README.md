@@ -61,7 +61,7 @@ int main()
 | word_char.at_least(2) | two or more word chars | (?:[\w]){2,} |
 | word_char.at_most(3) | up to three word chars | (?:[\w]){0,3} |
 | whitespace.count(2,3) | two or three whitespace chars | (?:[\s]){2,3} |
-| in(digit, range{'a','f'}) | hexadecimal digit | (?:[\da-f])+ |
+| in(digit, range{'a','f'}) | a hexadecimal digit | [\da-f] |
 | anything_not_in(' ', '/') | string without spaces and slashes | [^ /]* |
 | something_not_in(digit, '.') | non empty string without digits and dots | [^\d\\.]+ |
 | capture(word_char.count(3)) | capture three word chars | ((?:[\w]){3}) |
