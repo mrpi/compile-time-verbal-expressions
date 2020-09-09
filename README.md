@@ -45,21 +45,25 @@ int main()
 
 ## Syntax
 
+*using namespace ctve;* expected in following exampels
+
 | Code | Matches | PCRE |
 |-|-|-|
-| 'x' | exactly the given character | (?:x) |
-| "xyz" | exactly the given character sequence | (?:xzy) |
+| find('x') | exactly the given character | (?:x) |
 | find("xyz") | exactly the given character sequence | (?:xzy) |
-| maybe(".") | empty string or a single dot | (?:\\.)? |
+| 'x' | exactly the given character<br>(handled like *find('x')* by *operator+*) | (?:x) |
+| "xyz" | exactly the given character sequence<br>(handled like *find("xyz")* by *operator+*) | (?:xzy) |
+| maybe('.') | empty string or a single dot | (?:\\.)? |
 | maybe(any_char) | empty string or one char | (?:.)? |
 | digit | a single digit | [\d] |
 | digit.one_or_more() | one or more digits | (?:[\d])+ |
 | digit.zero_or_more() | zero or more digits | (?:[\d])* |
-| digit.at_least(2) | two or more digits | (?:[\d]){2,} |
-| digit.at_most(3) | up to three digits | (?:[\d]){0,3} |
-| digit.count(2,3) | two or three digits | (?:[\d]){2,3} |
-| anything_not_in(' ', '/') | string but not space or slash | [^ /]* |
-| something_not_in(' ', '/') | non empty string but not space or slash | [^ /]+ |
-| capture(word_char.count(3)) | capture three word char | ((?:[\w]){3}) |
+| word_char.at_least(2) | two or more word chars | (?:[\w]){2,} |
+| word_char.at_most(3) | up to three word chars | (?:[\w]){0,3} |
+| whitespace.count(2,3) | two or three whitespace chars | (?:[\s]){2,3} |
+| in(digit, range{'a','f'}) | hexadecimal digit | (?:[\da-f])+ |
+| anything_not_in(' ', '/') | string without spaces and slashes | [^ /]* |
+| something_not_in(digit, '.') | non empty string without digits and dots | [^\d\\.]+ |
+| capture(word_char.count(3)) | capture three word chars | ((?:[\w]){3}) |
 | "Hello" + maybe(whitespace) | "Hello" optionally followed by a whitespace | (?:Hello)(?:[\s])? |
 | find("Hello") \|\| "Hallo" | "Hello" or "Hallo" | (?:Hello)\|(?:Hallo) |
