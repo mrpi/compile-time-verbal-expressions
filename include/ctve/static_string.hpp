@@ -164,10 +164,13 @@ constexpr auto to_string(Int num)
   static_string<std::numeric_limits<Int>::digits + 1> reverseRes;
   static_string<std::numeric_limits<Int>::digits + 1> res;
 
-  if (num < 0)
+  if constexpr (std::numeric_limits<Int>::is_signed)
   {
-    res += '-';
-    num = -num;
+    if (num < 0)
+    {
+      res += '-';
+      num = -num;
+    }
   }
 
   if (!num)
