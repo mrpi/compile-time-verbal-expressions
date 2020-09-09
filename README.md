@@ -36,9 +36,30 @@ int main()
       = ctre::match<patterns::url>("https://github.com/mrpi/compile-time-verbal-expressions");
   if (match)
   {
-    std::cout << "host: " << std::string_view{host} << std::endl;
-    std::cout << "port: " << std::string_view{port} << std::endl;
-    std::cout << "path: " << std::string_view{path} << std::endl;
+    std::cout << "host: " << std::string_view{host} << '\n';
+    std::cout << "port: " << std::string_view{port} << '\n';
+    std::cout << "path: " << std::string_view{path} << '\n';
   }
 }
 ```
+
+## Syntax
+
+| Code | Matches | PCRE |  |  |
+|-|-|-|-|-|
+| 'x' | exactly the given character | (?:x) |  |  |
+| "xyz" | exactly the given character sequence | (?:xzy) |  |  |
+| find("xyz") | exactly the given character sequence | (?:xzy) |  |  |
+| maybe(".") | empty string or a single dot | (?:\\.)? |  |  |
+| maybe(any_char) | empty string or one char | (?:.)? |  |  |
+| digit | a single digit | [\d] ||
+| digit.one_or_more() | one or more digits | (?:[\d])+ ||
+| digit.zero_or_more() | zero or more digits | (?:[\d])* ||
+| digit.at_least(2) | two or more digits | (?:[\d]){2,} ||
+| digit.at_most(3) | up to three digits | (?:[\d]){0,3} ||
+| digit.count(2,3) | two or three digits | (?:[\d]){2,3} ||
+| anything_not_in(' ', '/') | string but not space or slash | [^ /]* ||
+| something_not_in(' ', '/') | non empty string but not space or slash | [^ /]+ ||
+| capture(word_char.count(3)) | capture three word char | ((?:[\w]){3}) ||
+| "Hello" + maybe(whitespace) | "Hello" optionally followed by a whitespace | (?:Hello)(?:[\s])? ||
+| find("Hello") \|\| "Hallo" | "Hello" or "Hallo" | (?:Hello)\|(?:Hallo) ||
