@@ -3,6 +3,7 @@
 #include <array>
 #include <stdexcept>
 #include <string_view>
+#include <limits>
 
 namespace ctve
 {
@@ -64,6 +65,21 @@ public:
 
   constexpr operator std::string_view() const { return {data(), size()}; }
 
+  [[nodiscard]] constexpr auto
+  substr(size_t pos = 0, size_t count = std::string_view::npos) const
+  {
+    impl::enforce(pos <= size());
+    static_string<Len> res;
+    auto itr = begin() + pos;
+    while (itr != end())
+    {
+      if (res.size() == count)
+        break;
+      res += *(itr++);
+    }
+    return res;
+  }
+
   constexpr static_string& operator+=(char c)
   {
     impl::enforce(size() + 1 <= Len);
@@ -103,6 +119,15 @@ constexpr auto operator+(const static_string<Len>& str, char c)
 {
   static_string<Len + 1> res = str;
   res += c;
+  return res;
+}
+
+template <size_t Len>
+constexpr auto operator+(char c, const static_string<Len>& str)
+{
+  static_string<Len + 1> res;
+  res += c;
+  res += str;
   return res;
 }
 

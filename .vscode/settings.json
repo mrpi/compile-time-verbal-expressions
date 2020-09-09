@@ -2,6 +2,7 @@
     "files.associations": {
         "limits": "cpp",
         "__config": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "*.ipp": "cpp"
     }
 }

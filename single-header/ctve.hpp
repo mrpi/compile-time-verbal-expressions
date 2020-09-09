@@ -223,6 +223,8 @@ Software.
 
 #include <array>
 #include <stdexcept>
+#include <string_view>
+#include <limits>
 
 namespace ctve
 {
@@ -284,6 +286,21 @@ public:
 
   constexpr operator std::string_view() const { return {data(), size()}; }
 
+  [[nodiscard]] constexpr auto
+  substr(size_t pos = 0, size_t count = std::string_view::npos) const
+  {
+    impl::enforce(pos <= size());
+    static_string<Len> res;
+    auto itr = begin() + pos;
+    while (itr != end())
+    {
+      if (res.size() == count)
+        break;
+      res += *(itr++);
+    }
+    return res;
+  }
+
   constexpr static_string& operator+=(char c)
   {
     impl::enforce(size() + 1 <= Len);
@@ -323,6 +340,15 @@ constexpr auto operator+(const static_string<Len>& str, char c)
 {
   static_string<Len + 1> res = str;
   res += c;
+  return res;
+}
+
+template <size_t Len>
+constexpr auto operator+(char c, const static_string<Len>& str)
+{
+  static_string<Len + 1> res;
+  res += c;
+  res += str;
   return res;
 }
 
@@ -508,11 +534,11 @@ namespace impl
 namespace ctve::impl
 {
 template <size_t Len>
-struct character_type : pattern<Len>
+struct character_type : pattern<Len + 2>
 {
   template <size_t BufLen>
   constexpr explicit character_type(const char (&buf)[BufLen])
-   : pattern<Len>{static_string{buf}}
+   : pattern<Len + 2>{'[' + static_string{buf} + ']'}
   {
   }
 };
@@ -647,12 +673,15 @@ struct chrclass_fn
   template <typename T>
   static constexpr auto to_str(T&& buf)
   {
-    static_assert(
-        std::is_same_v<std::decay_t<decltype(buf)>, char> ||
-            std::is_same_v<std::decay_t<decltype(buf)>, range> ||
-            impl::is_character_type<std::decay_t<decltype(buf)>>::value,
-        "Only characters, character types and ranges allowed!");
-    return sanitize(buf);
+    if constexpr (impl::is_character_type<std::decay_t<decltype(buf)>>::value)
+      return buf.str.substr(1, buf.str.size() - 2);
+    else
+    {
+      static_assert(std::is_same_v<std::decay_t<decltype(buf)>, char> ||
+                        std::is_same_v<std::decay_t<decltype(buf)>, range>,
+                    "Only characters, character types and ranges allowed!");
+      return sanitize(buf);
+    }
   }
 
   template <typename T, typename... Args>
@@ -712,11 +741,10 @@ static inline constexpr auto in = impl::chrclass_fn("[", "]");
 static inline constexpr auto not_in = impl::chrclass_fn("[^", "]");
 static inline constexpr auto capture = impl::str_or_pattern_fn("(", ")");
 static inline constexpr auto something_not_in = impl::chrclass_fn("[^", "]+");
+static inline constexpr auto anything_not_in = impl::chrclass_fn("[^", "]*");
 
-static inline constexpr auto any_char = impl::character_type{"."};
 static inline constexpr auto whitespace = impl::character_type{"\\s"};
-static inline constexpr auto space = whitespace;
-static inline constexpr auto non_space = impl::character_type{"\\S"};
+static inline constexpr auto non_whitespace = impl::character_type{"\\S"};
 static inline constexpr auto word_char = impl::character_type{"\\w"};
 static inline constexpr auto non_word_char = impl::character_type{"\\W"};
 static inline constexpr auto word_boundary = impl::character_type{"\\b"};
@@ -724,6 +752,25 @@ static inline constexpr auto digit = impl::character_type{"\\d"};
 static inline constexpr auto non_digit = impl::character_type{"\\D"};
 static inline constexpr auto tab = impl::character_type{"\\t"};
 
+namespace posix
+{
+static inline constexpr auto alnum = impl::character_type{"[:alnum:]"};
+static inline constexpr auto alpha = impl::character_type{"[:alpha:]"};
+static inline constexpr auto ascii = impl::character_type{"[:ascii:]"};
+static inline constexpr auto blank = impl::character_type{"[:blank:]"};
+static inline constexpr auto cntrl = impl::character_type{"[:cntrl:]"};
+static inline constexpr auto digit = impl::character_type{"[:digit:]"};
+static inline constexpr auto graph = impl::character_type{"[:graph:]"};
+static inline constexpr auto lower = impl::character_type{"[:lower:]"};
+static inline constexpr auto print = impl::character_type{"[:print:]"};
+static inline constexpr auto punct = impl::character_type{"[:punct:]"};
+static inline constexpr auto space = impl::character_type{"[:space:]"};
+static inline constexpr auto upper = impl::character_type{"[:upper:]"};
+static inline constexpr auto word = impl::character_type{"[:word:]"};
+static inline constexpr auto xdigit = impl::character_type{"[:xdigit:]"};
+}
+
+static inline constexpr auto any_char = pattern{static_string{"."}};
 static inline constexpr auto word = pattern{static_string{"\\w+"}};
 static inline constexpr auto line_break =
     pattern{static_string{"(?:\\r\\n|\\r|\\n)"}};
@@ -741,6 +788,18 @@ template <size_t BufLen, size_t Len>
 constexpr auto operator+(const char (&buf)[BufLen], const pattern<Len>& pattern)
 {
   return find(buf) + pattern;
+}
+
+template <size_t Len>
+constexpr auto operator+(const pattern<Len>& pattern, char c)
+{
+  return pattern + find(c);
+}
+
+template <size_t Len>
+constexpr auto operator+(char c, const pattern<Len>& pattern)
+{
+  return find(c) + pattern;
 }
 
 } // namespace ctve

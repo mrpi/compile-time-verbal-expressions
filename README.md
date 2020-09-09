@@ -26,8 +26,8 @@ static constexpr auto url =
     + "://"
     + maybe("www.")
     + capture(something_not_in(' ', '/', ':'))
-    + maybe(then(':') + capture(digit.one_or_more()))
-    + maybe(capture(then('/') + anything_not_in(' ')));
+    + maybe(':' + capture(digit.one_or_more()))
+    + maybe(capture('/' + anything_not_in(' ')));
 }
 
 int main()

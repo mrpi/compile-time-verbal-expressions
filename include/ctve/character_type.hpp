@@ -5,11 +5,11 @@
 namespace ctve::impl
 {
 template <size_t Len>
-struct character_type : pattern<Len>
+struct character_type : pattern<Len + 2>
 {
   template <size_t BufLen>
   constexpr explicit character_type(const char (&buf)[BufLen])
-   : pattern<Len>{static_string{buf}}
+   : pattern<Len + 2>{'[' + static_string{buf} + ']'}
   {
   }
 };

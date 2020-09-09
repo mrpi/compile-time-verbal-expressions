@@ -107,13 +107,13 @@ static_assert(!CTRE_CREATE(threeToFiveAB).match("ababba"sv));
 
 // would be bad, if the readme example fails unnoticed ;-)
 static constexpr auto urlPattern =
-    "http"                                            //
-    + maybe('s')                                      //
-    + "://"                                           //
-    + maybe("www.")                                   //
-    + capture(something_not_in(' ', '/', ':'))        //
-    + maybe(then(':') + capture(digit.one_or_more())) //
-    + maybe(capture(then('/') + anything_not_in(' ')));
+    "http"                                       //
+    + maybe('s')                                 //
+    + "://"                                      //
+    + maybe("www.")                              //
+    + capture(something_not_in(' ', '/', ':'))   //
+    + maybe(':' + capture(digit.one_or_more()))  //
+    + maybe(capture('/' + anything_not_in(' ')));
 
 static constexpr auto testUrl =
     "https://github.com:443/mrpi/compile-time-verbal-expressions"sv;
@@ -124,3 +124,18 @@ static_assert(CTRE_CREATE(urlPattern).match(testUrl).get<1>() ==
 static_assert(CTRE_CREATE(urlPattern).match(testUrl).get<2>() == "443"sv);
 static_assert(CTRE_CREATE(urlPattern).match(testUrl).get<3>() ==
               "/mrpi/compile-time-verbal-expressions"sv);
+
+static constexpr auto cOrPosixUpper = in(posix::xdigit, 'x').one_or_more();
+static_assert(!CTRE_CREATE(cOrPosixUpper).match(""));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("a"));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("9"));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("A"));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("AB"));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("ABc"));
+static_assert(CTRE_CREATE(cOrPosixUpper).match("ABcx"));
+static_assert(!CTRE_CREATE(cOrPosixUpper).match("ABg"));
+
+static constexpr auto upperOrDigit = posix::upper || posix::digit;
+static_assert(CTRE_CREATE(upperOrDigit).match("A"));
+static_assert(!CTRE_CREATE(upperOrDigit).match("a"));
+static_assert(CTRE_CREATE(upperOrDigit).match("0"));

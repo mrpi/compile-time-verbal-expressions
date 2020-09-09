@@ -48,12 +48,15 @@ struct chrclass_fn
   template <typename T>
   static constexpr auto to_str(T&& buf)
   {
-    static_assert(
-        std::is_same_v<std::decay_t<decltype(buf)>, char> ||
-            std::is_same_v<std::decay_t<decltype(buf)>, range> ||
-            impl::is_character_type<std::decay_t<decltype(buf)>>::value,
-        "Only characters, character types and ranges allowed!");
-    return sanitize(buf);
+    if constexpr (impl::is_character_type<std::decay_t<decltype(buf)>>::value)
+      return buf.str.substr(1, buf.str.size() - 2);
+    else
+    {
+      static_assert(std::is_same_v<std::decay_t<decltype(buf)>, char> ||
+                        std::is_same_v<std::decay_t<decltype(buf)>, range>,
+                    "Only characters, character types and ranges allowed!");
+      return sanitize(buf);
+    }
   }
 
   template <typename T, typename... Args>
