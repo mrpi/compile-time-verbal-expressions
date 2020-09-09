@@ -46,7 +46,7 @@ int main()
 ## Syntax
 
 | Code | Matches | PCRE |
-|-|-|-|-|-|
+|-|-|-|
 | 'x' | exactly the given character | (?:x) |
 | "xyz" | exactly the given character sequence | (?:xzy) |
 | find("xyz") | exactly the given character sequence | (?:xzy) |
