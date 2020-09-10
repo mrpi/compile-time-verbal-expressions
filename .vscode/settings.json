@@ -4,5 +4,6 @@
         "__config": "cpp",
         "string_view": "cpp",
         "*.ipp": "cpp"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

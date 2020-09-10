@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_STATIC_STR_HPP
+#define CTVE_STATIC_STR_HPP
 
 #include <array>
 #include <stdexcept>
@@ -191,3 +192,5 @@ constexpr auto to_string(Int num)
 }
 
 } // namespace ctve
+
+#endif // CTVE_STATIC_STR_HPP

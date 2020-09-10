@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_RANGE_HPP
+#define CTVE_RANGE_HPP
 
 #include "regex_utility.hpp"
 #include "static_string.hpp"
@@ -21,3 +22,5 @@ namespace impl
   }
 } // namespace impl
 } // namespace ctve
+
+#endif // CTVE_RANGE_HPP

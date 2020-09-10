@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_PATTERN_HPP
+#define CTVE_PATTERN_HPP
 
 #include "static_string.hpp"
 
@@ -122,3 +123,5 @@ namespace impl
 } // namespace impl
 
 } // namespace ctve
+
+#endif // CTVE_PATTERN_HPP

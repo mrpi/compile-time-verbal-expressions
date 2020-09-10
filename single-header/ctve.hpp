@@ -219,7 +219,20 @@ the License, but only in their entirety and only with respect to the Combined
 Software.
 */
 
-#pragma once
+#ifndef CTVE_HPP
+#define CTVE_HPP
+
+#ifndef CTVE_FUNC_BUILDER_HPP
+#define CTVE_FUNC_BUILDER_HPP
+
+#ifndef CTVE_CHAR_TYPE_HPP
+#define CTVE_CHAR_TYPE_HPP
+
+#ifndef CTVE_PATTERN_HPP
+#define CTVE_PATTERN_HPP
+
+#ifndef CTVE_STATIC_STR_HPP
+#define CTVE_STATIC_STR_HPP
 
 #include <array>
 #include <stdexcept>
@@ -413,6 +426,8 @@ constexpr auto to_string(Int num)
 
 } // namespace ctve
 
+#endif // CTVE_STATIC_STR_HPP
+
 namespace ctve
 {
 template <size_t Len = 0>
@@ -534,6 +549,8 @@ namespace impl
 
 } // namespace ctve
 
+#endif // CTVE_PATTERN_HPP
+
 namespace ctve::impl
 {
 template <size_t Len>
@@ -560,6 +577,14 @@ struct is_character_type<character_type<Len>> : std::true_type
 };
 
 } // namespace ctve::impl
+
+#endif // CTVE_CHAR_TYPE_HPP
+
+#ifndef CTVE_RANGE_HPP
+#define CTVE_RANGE_HPP
+
+#ifndef CTVE_REGEX_UTIL_HPP
+#define CTVE_REGEX_UTIL_HPP
 
 namespace ctve::impl
 {
@@ -613,6 +638,8 @@ template <size_t BufLen>
 
 } // namespace ctve::impl
 
+#endif // CTVE_REGEX_UTIL_HPP
+
 namespace ctve
 {
 struct range
@@ -631,6 +658,8 @@ namespace impl
   }
 } // namespace impl
 } // namespace ctve
+
+#endif // CTVE_RANGE_HPP
 
 namespace ctve::impl
 {
@@ -733,6 +762,8 @@ str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
 
 } // namespace ctve::impl
 
+#endif // CTVE_FUNC_BUILDER_HPP
+
 namespace ctve
 {
 
@@ -806,3 +837,5 @@ constexpr auto operator+(char c, const pattern<Len>& pattern)
 }
 
 } // namespace ctve
+
+#endif // CTVE_HPP

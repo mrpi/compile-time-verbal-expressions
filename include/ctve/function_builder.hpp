@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_FUNC_BUILDER_HPP
+#define CTVE_FUNC_BUILDER_HPP
 
 #include "character_type.hpp"
 #include "pattern.hpp"
@@ -104,3 +105,5 @@ str_fn(const char (&prefix)[BufLen1], const char (&suffix)[BufLen2])
     ->str_fn<BufLen1 - 1, BufLen2 - 1>;
 
 } // namespace ctve::impl
+
+#endif // CTVE_FUNC_BUILDER_HPP

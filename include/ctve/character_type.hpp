@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_CHAR_TYPE_HPP
+#define CTVE_CHAR_TYPE_HPP
 
 #include "pattern.hpp"
 
@@ -28,3 +29,5 @@ struct is_character_type<character_type<Len>> : std::true_type
 };
 
 } // namespace ctve::impl
+
+#endif // CTVE_CHAR_TYPE_HPP

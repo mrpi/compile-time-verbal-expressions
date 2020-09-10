@@ -1,9 +1,9 @@
-#pragma once
+#ifndef CTVE_HPP
+#define CTVE_HPP
 
 #include "ctve/function_builder.hpp"
 #include "ctve/pattern.hpp"
 #include "ctve/static_string.hpp"
-
 namespace ctve
 {
 
@@ -77,3 +77,5 @@ constexpr auto operator+(char c, const pattern<Len>& pattern)
 }
 
 } // namespace ctve
+
+#endif // CTVE_HPP

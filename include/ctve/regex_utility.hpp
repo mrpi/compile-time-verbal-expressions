@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CTVE_REGEX_UTIL_HPP
+#define CTVE_REGEX_UTIL_HPP
 
 namespace ctve::impl
 {
@@ -51,3 +52,5 @@ template <size_t BufLen>
 }
 
 } // namespace ctve::impl
+
+#endif // CTVE_REGEX_UTIL_HPP
