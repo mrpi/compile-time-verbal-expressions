@@ -139,3 +139,11 @@ static constexpr auto upperOrDigit = posix::upper || posix::digit;
 static_assert(CTRE_CREATE(upperOrDigit).match("A"));
 static_assert(!CTRE_CREATE(upperOrDigit).match("a"));
 static_assert(CTRE_CREATE(upperOrDigit).match("0"));
+
+static constexpr auto escaped = (not_in('\\', '"', ']') || "\\\\" || "\\\"" || "\\]").one_or_more();
+static_assert(!CTRE_CREATE(escaped).match(R"(ab\c)"));
+static_assert(CTRE_CREATE(escaped).match(R"(ab\\c)"));
+static_assert(!CTRE_CREATE(escaped).match(R"(ab"c)"));
+static_assert(CTRE_CREATE(escaped).match(R"(ab\"c)"));
+static_assert(!CTRE_CREATE(escaped).match(R"(ab]c)"));
+static_assert(CTRE_CREATE(escaped).match(R"(ab\]c)"));
