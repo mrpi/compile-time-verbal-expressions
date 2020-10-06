@@ -510,24 +510,6 @@ constexpr auto operator+(const pattern<Len1>& p1, const pattern<Len2>& p2)
   return pattern{p1.str + p2.str};
 }
 
-template <size_t Len1, size_t Len2>
-constexpr auto operator||(const pattern<Len1>& p1, const pattern<Len2>& p2)
-{
-  return pattern{"(?:" + p1.str + ")|(?:" + p2.str + ")"};
-}
-
-template <size_t BufLen, size_t Len>
-constexpr auto operator||(const char (&buf)[BufLen], const pattern<Len>& p)
-{
-  return pattern{"(?:" + static_string{buf} + ")|(?:" + p.str + ")"};
-}
-
-template <size_t BufLen, size_t Len>
-constexpr auto operator||(const pattern<Len>& p, const char (&buf)[BufLen])
-{
-  return pattern{"(?:" + p.str + ")|(?:" + static_string{buf} + ")"};
-}
-
 namespace impl
 {
   template <typename T>
@@ -834,6 +816,36 @@ template <size_t Len>
 constexpr auto operator+(char c, const pattern<Len>& pattern)
 {
   return find(c) + pattern;
+}
+
+template <size_t Len1, size_t Len2>
+constexpr auto operator||(const pattern<Len1>& p1, const pattern<Len2>& p2)
+{
+  return pattern{"(?:" + p1.str + ")|(?:" + p2.str + ")"};
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const char (&buf)[BufLen], const pattern<Len>& p)
+{
+  return find(buf) || p;
+}
+
+template <size_t Len>
+constexpr auto operator||(char c, const pattern<Len>& p)
+{
+  return find(c) || p;
+}
+
+template <size_t BufLen, size_t Len>
+constexpr auto operator||(const pattern<Len>& p, const char (&buf)[BufLen])
+{
+  return p || find(buf);
+}
+
+template <size_t Len>
+constexpr auto operator||(const pattern<Len>& p, const char c)
+{
+  return p || find(c);
 }
 
 } // namespace ctve
