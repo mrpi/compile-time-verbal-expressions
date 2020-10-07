@@ -147,3 +147,15 @@ static_assert(!CTRE_CREATE(escaped).match(R"(ab"c)"));
 static_assert(CTRE_CREATE(escaped).match(R"(ab\"c)"));
 static_assert(!CTRE_CREATE(escaped).match(R"(ab]c)"));
 static_assert(CTRE_CREATE(escaped).match(R"(ab\]c)"));
+
+constexpr auto uuid1 = "3b42ecd2-647d-42b1-9b0c-b0df0f859384"sv;
+constexpr auto notUuid1 = "3b42ecd2_647d_42b1_9b0c_b0df0f859384"sv;
+
+static constexpr auto hexDigit = in(digit, range{'a', 'f'});
+static constexpr auto isUuid = hexDigit.count(8) + '-' + hexDigit.count(4) + '-' + hexDigit.count(4) + '-' + hexDigit.count(4) + '-' + hexDigit.count(12);
+static_assert(CTRE_CREATE(isUuid).match(uuid1));
+static_assert(!CTRE_CREATE(isUuid).match(notUuid1));
+
+static constexpr auto isLikeUuid = in(digit, range{'a', 'f'}, '-').count(36);
+static_assert(CTRE_CREATE(isLikeUuid).match(uuid1));
+static_assert(!CTRE_CREATE(isLikeUuid).match(notUuid1));

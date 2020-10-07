@@ -22,6 +22,7 @@ constexpr bool needsEscaping(char c)
   case '}':
   case '[':
   case ']':
+  case '-':
     return true;
   default:
     return false;
