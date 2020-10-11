@@ -50,7 +50,7 @@ struct chrclass_fn
   static constexpr auto to_str(T&& buf)
   {
     if constexpr (impl::is_character_type<std::decay_t<decltype(buf)>>::value)
-      return buf.str.substr(1, buf.str.size() - 2);
+      return buf.str.template substr<-2>(1, buf.str.size() - 2);
     else
     {
       static_assert(std::is_same_v<std::decay_t<decltype(buf)>, char> ||

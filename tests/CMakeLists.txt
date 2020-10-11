@@ -12,3 +12,4 @@ foreach(ctve_self_test_file ${ctve_self_tests})
 	
 	add_dependencies(ctve_self_test ctve_self_test_${ctve_self_test_name})
 endforeach()
+ 

@@ -153,6 +153,15 @@ constexpr auto notUuid1 = "3b42ecd2_647d_42b1_9b0c_b0df0f859384"sv;
 
 static constexpr auto hexDigit = in(digit, range{'a', 'f'});
 static constexpr auto isUuid = hexDigit.count(8) + '-' + hexDigit.count(4) + '-' + hexDigit.count(4) + '-' + hexDigit.count(4) + '-' + hexDigit.count(12);
+
+template<auto& in>
+constexpr auto ctveShrinkToFit() -> ctve::pattern<in.size()>
+{
+    return ctve::pattern{ctve::static_string<in.size()>{in.str}};
+}
+
+static constexpr auto isUuidShort = ctveShrinkToFit<isUuid>();
+
 static_assert(CTRE_CREATE(isUuid).match(uuid1));
 static_assert(!CTRE_CREATE(isUuid).match(notUuid1));
 

@@ -265,7 +265,7 @@ public:
   template <size_t OtherLen>
   constexpr static_string(const static_string<OtherLen> other)
   {
-    impl::enforce(Len >= OtherLen);
+    impl::enforce(Len >= other.size());
     for (size_t i = 0; i < other.size(); i++)
       data_[i] = other[i];
     len_ = other.size();
@@ -299,11 +299,12 @@ public:
 
   constexpr operator std::string_view() const { return {data(), size()}; }
 
+  template<int LenDiff>
   [[nodiscard]] constexpr auto
   substr(size_t pos = 0, size_t count = std::string_view::npos) const
   {
     impl::enforce(pos <= size());
-    static_string<Len> res;
+    static_string<Len + LenDiff> res;
     auto itr = begin() + pos;
     while (itr != end())
     {
@@ -312,6 +313,12 @@ public:
       res += *(itr++);
     }
     return res;
+  }
+
+  [[nodiscard]] constexpr auto
+  substr(size_t pos = 0, size_t count = std::string_view::npos) const
+  {
+     return substr<0>(pos, count);
   }
 
   constexpr static_string& operator+=(char c)
@@ -689,7 +696,7 @@ struct chrclass_fn
   static constexpr auto to_str(T&& buf)
   {
     if constexpr (impl::is_character_type<std::decay_t<decltype(buf)>>::value)
-      return buf.str.substr(1, buf.str.size() - 2);
+      return buf.str.template substr<-2>(1, buf.str.size() - 2);
     else
     {
       static_assert(std::is_same_v<std::decay_t<decltype(buf)>, char> ||
