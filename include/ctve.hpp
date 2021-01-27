@@ -26,6 +26,8 @@ static inline constexpr auto digit = impl::character_type{"\\d"};
 static inline constexpr auto non_digit = impl::character_type{"\\D"};
 static inline constexpr auto tab = impl::character_type{"\\t"};
 
+static inline constexpr auto xdigit = in(digit, range{ 'a', 'f' }, range{ 'A', 'F' });
+
 namespace posix
 {
 static inline constexpr auto alnum = impl::character_type{"[:alnum:]"};
